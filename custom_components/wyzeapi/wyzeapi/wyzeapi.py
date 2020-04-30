@@ -10,6 +10,7 @@ from .wyzeapi_exceptions import WyzeApiError, AccessTokenError
 from .wyze_request import WyzeRequest
 from .wyze_bulb import WyzeBulb
 from .wyze_switch import WyzeSwitch
+from .wyze_sensor import WyzeSensor
 
 class WyzeApi():
     def __init__(self, user_name, password):
@@ -116,6 +117,31 @@ class WyzeApi():
                     ))
 
         return switches
+
+    async def async_list_binary_sensors(self):
+        _LOGGER.debug("Wyze Api listing contact switches.")
+        binarySensors = []
+
+        for device in await self.async_get_devices():
+            if (device['product_type'] == "ContactSensor"):
+                binarySensors.append(WyzeSensor(
+                    self,
+                    device['mac'],
+                    device['nickname'],
+                    ("on" if device['device_params']['open_close_state'] == 1 else "off"),
+                    device['product_model'],
+                    ))
+
+            elif (device['product_type'] == "MotionSensor"):
+                binarySensors.append(WyzeSensor(
+                    self,
+                    device['mac'],
+                    device['nickname'],
+                    ("on" if device['device_params']['motion_state'] == 1 else "off"),
+                    device['product_model'],
+                    ))
+
+        return binarySensors
 
     async def async_do_request(self, url, payload):
         _LOGGER.debug("Wyze Api doing request.")
