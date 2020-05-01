@@ -43,7 +43,7 @@ class WyzeSensor():
             data = await self._api.async_do_request(url, payload)
 
             for item in data['data']['property_list']:
-                if item['pid'] == "P3":
+                if item['pid'] == "P1301" or item['pid'] == "P1302":
                     self._state = True if int(item['value']) == 1 else False
                 elif item['pid'] == "P5":
                     self._avaliable = False if int(item['value']) == 0 else True
